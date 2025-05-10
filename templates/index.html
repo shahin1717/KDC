@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style-kdc.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Key Distribution Center</title>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light"  >
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+            <ul class="navbar-nav mx-auto text-center">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.url.path == '/' %}active{% endif %}" href="/">Home</a>
+                </li>
+                {% if user %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.url.path == '/send' %}active{% endif %}" href="/send">Messages</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.url.path == '/profile' %}active{% endif %}" href="/profile">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.url.path == '/login' %}active{% endif %}" href="/login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.url.path == '/register' %}active{% endif %}" href="/register">Register</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+        
+    </header>
+    <main>
+        <div class ="container mt-5 ">
+            <div class="welcome">
+                <h1>Welcome to Key Distribution Center</h1>
+            </div>
+            <div class="mes">
+            {% if user %}
+                <p>Welcome, {{ user }}! Navigate to <a href="/send">Send Message</a> to get started.</p>
+            {% else %}
+                <p>Please <a href="/login">login</a> or <a href="/register">register</a> to access the Send Message feature.</p>
+            {% endif %}
+            <p>This application allows you to securely send messages using symmetric encryption.</p>
+    </div>
+</div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
