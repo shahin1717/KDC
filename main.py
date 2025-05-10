@@ -16,16 +16,20 @@ import secrets
 from database import  SessionLocal, User, Message, get_db, get_user, create_user, verify_password
 from crypto import generate_keypair, rsa_encrypt, rsa_decrypt, caesar_encrypt, caesar_decrypt
 
-# Setup logging
+# Setup logging  for debugging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+# Database Configuration
 pymysql.install_as_MySQLdb()
+
+# FastAPI app setup
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+# Middleware setup
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -33,6 +37,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+# Session middleware for user sessions
 app.add_middleware(
     SessionMiddleware,
     secret_key=secrets.token_hex(32),
@@ -41,7 +46,7 @@ app.add_middleware(
     https_only=False
 )
 
-# Background task to delete old messages
+# Background task to delete old messages (5 minutes old)
 def delete_old_messages():
     try:
         db = SessionLocal()
@@ -56,12 +61,19 @@ def delete_old_messages():
     finally:
         db.close()
 
-# Start scheduler
+# Start scheduler to run the delete_old_messages function
 scheduler = BackgroundScheduler()
 scheduler.add_job(delete_old_messages, 'interval', minutes=1)  # Check every minute
 scheduler.start()
 
-# Routes
+# Routes (its my main pages and endpoints)
+'''
+    In parts: `messages` and `send` i have added some error handling and logging 
+    to make sure that if something goes wrong i can see it in the logs(terminal)
+    and i can also see the session of the user and if the user is logged in or not
+    and if the user is logged in i can see the session of the user.
+'''
+
 @app.on_event("shutdown")
 def shutdown_event():
     scheduler.shutdown()
@@ -105,7 +117,7 @@ def read_register(request: Request, db: Session = Depends(get_db)):
             logger.warning(f"Invalid user in session: {user}, clearing session")
             request.session.clear()  # Clear invalid session
     return templates.TemplateResponse("register.html", {"request": request})
-# main.py (Updated snippet for /profile)
+
 @app.get("/profile", response_class=HTMLResponse)
 def read_profile(request: Request, db: Session = Depends(get_db)):
     user = request.session.get("user")
@@ -280,6 +292,8 @@ async def send_message(
             "error": "An unexpected error occurred. Please try again."
         })
 
+
+# Authentication and Registration 
 @app.post("/login")
 async def login_user(
     username: str = Form(...),

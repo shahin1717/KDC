@@ -1,12 +1,14 @@
-# crypto.py (Updated)
 import math
 import random
 from typing import Tuple
 import logging
 
+# Setup logging for debugging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+# RSA and Caesar Cipher Implementation
+# Check if a number is prime
 def is_prime(n: int) -> bool:
     if n < 2:
         return False
@@ -15,18 +17,21 @@ def is_prime(n: int) -> bool:
             return False
     return True
 
+# Generate a random prime number within a range
 def generate_prime(min_value: int, max_value: int) -> int:
     prime = random.randint(min_value, max_value)
     while not is_prime(prime):
         prime = random.randint(min_value, max_value)
     return prime
 
+# Calculate d from d*e ≡ 1 (mod φ(n))
 def mod_inverse(e: int, phi: int) -> int:
     for d in range(3, phi):
         if (d * e) % phi == 1:
             return d
     raise ValueError("Mod inverse does not exist")
 
+# Generate RSA keypair
 def generate_keypair() -> Tuple[Tuple[int, int], Tuple[int, int]]:
     try:
         p = generate_prime(100, 1000)
@@ -45,6 +50,7 @@ def generate_keypair() -> Tuple[Tuple[int, int], Tuple[int, int]]:
         logger.error(f"Error in generate_keypair: {str(e)}")
         raise
 
+# RSA Encryption and Decryption
 def rsa_encrypt(plaintext: int, public_key: Tuple[int, int]) -> int:
     try:
         e, n = public_key
@@ -65,6 +71,7 @@ def rsa_decrypt(ciphertext: int, private_key: Tuple[int, int]) -> int:
         logger.error(f"Error in rsa_decrypt: {str(e)}")
         raise
 
+# Caesar Cipher Encryption and Decryption
 def caesar_encrypt(message: str, key: int) -> str:
     try:
         encrypted = ""

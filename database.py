@@ -1,4 +1,3 @@
-# database.py (Updated)
 from sqlalchemy import create_engine, Column, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
@@ -12,22 +11,27 @@ import os
 
 pymysql.install_as_MySQLdb()
 
-# Setup logging
+# Setup logging for debugging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-load_dotenv()
+
+
+# Database Configuration 
+load_dotenv() ##* Load environment variables from .env file
 SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL")
-try:
+
+try:  #* Establish database connection
     engine = create_engine(SQLALCHEMY_DATABASE_URL)
     logger.info("Database connection established")
 except Exception as e:
     logger.error(f"Database connection failed: {str(e)}")
     raise
 
+# Create a new session local class
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# Database Models
+# Database Models (Tables)
 class User(Base):
     __tablename__ = "users_db"
     userID = Column(Integer, primary_key=True, index=True)
@@ -47,7 +51,7 @@ class Message(Base):
     encrypted_message = Column(String(255), nullable=False)  # Caesar-encrypted message
     created_at = Column(DateTime, default=datetime.utcnow)  # Timestamp for deletion
 
-Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)  #* Create tables in the database
 
 # Helper Functions
 def get_db():
